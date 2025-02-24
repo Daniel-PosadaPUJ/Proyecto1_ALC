@@ -1,4 +1,4 @@
-# Proyecto1_ALC: Implementación de K-means desde Cero en Python
+# Implementación de K-means desde Cero en Python
 
 ## Descripción  
 Este proyecto consiste en implementar el algoritmo **K-means** desde cero en Python, sin utilizar librerías especializadas de clustering, como parte de un taller para el curso con el profesor Abel Alvarez. Se trabaja con datos sintéticos en espacios de **2D y 3D**, permitiendo comparar los resultados del algoritmo con etiquetas verdaderas. Además, se analiza la influencia de diferentes métricas de distancia en la asignación de clusters.
