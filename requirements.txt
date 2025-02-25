@@ -2,5 +2,4 @@ pandas==2.1.1           # Para cargar y manipular datos
 numpy==1.26.0           # Para cálculos numéricos y manipulación de arrays
 matplotlib==3.8.0       # Para crear gráficos 2D y 3D
 scipy==1.11.2           # Para cálculos matemáticos y métricas de distancia
-seaborn==0.11.2         # Para crear gráficos estadísticos
 

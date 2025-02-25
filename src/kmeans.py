@@ -6,22 +6,25 @@ class KMeans:
         self.max_iter = max_iter
         self.tol = tol
         self.random_state = random_state
-        self.distance_func = distance_func if distance_func else self._euclidean_distance
+        self.distance_func = distance_func if distance_func else self._p_distance
 
     def fit(self, X):
-        if self.random_state:
-            np.random.seed(self.random_state)
         i = 0
         change = np.inf
-        n_samples = X.shape[0]
-        random_indices = np.random.choice(n_samples, self.n_clusters, replace=False)
-        self.centroids = X[random_indices]
+        self.centroids = self._initialize_centroids(X)
         while i < self.max_iter and change > self.tol:
             self.labels = self._assign_clusters(X)
             new_centroids = self._compute_centroids(X)
             self.centroids = new_centroids
             change = np.mean(np.abs(new_centroids - self.centroids, axis=1))
             i += 1
+
+    def _initialize_centroids(self, X):
+        if self.random_state:
+            np.random.seed(self.random_state)
+        min_vals = np.min(X, axis=0)
+        max_vals = np.max(X, axis=0)
+        return min_vals + (max_vals - min_vals) * np.random.rand(self.n_clusters, X.shape[1])
 
     def _assign_clusters(self, X):
         distances = self.distance_func(X[:, np.newaxis], self.centroids)
@@ -40,5 +43,5 @@ class KMeans:
         distancias = self.distance_func(X, self.centroids[self.labels])
         return np.sum(distancias)
 
-    def _euclidean_distance(self, X, centroids):
-        return np.linalg.norm(X - centroids, axis=2)
+    def _p_distance_to_inertia(self, X, centroids, p=2):
+        return np.sum(np.abs(X - centroids) ** p, axis=2)
