@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 
 def plot_elbow_method(X, max_k=10, distance_func=None):
-    inercia = np.array([])
+    inercia = []
     for k in range(1, max_k + 1):
         kmeans = KMeans(n_clusters=k, distance_func=distance_func)
         kmeans.fit(X)

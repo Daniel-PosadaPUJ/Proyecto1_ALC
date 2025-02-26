@@ -2,6 +2,8 @@ import numpy as np
 
 class KMeans:
     def __init__(self, n_clusters=3, max_iter=300, tol=1e-4, distance_func=None, random_state=None):
+        self.labels = None
+        self.centroids = None
         self.n_clusters = n_clusters
         self.max_iter = max_iter
         self.tol = tol
@@ -9,38 +11,30 @@ class KMeans:
         self.distance_func = distance_func if distance_func else self._default_distance
 
     def fit(self, X):
+        X = X.to_numpy(dtype=np.float64)
         i = 0
         change = np.inf
         self.centroids = self._initialize_centroids(X)
         while i < self.max_iter and change > self.tol:
             self.labels = self._assign_clusters(X)
             new_centroids = self._compute_centroids(X)
-            change = np.mean(np.linalg.norm(new_centroids - self.centroids, axis=1))
+            change = np.sum((new_centroids - self.centroids)**2)
             self.centroids = new_centroids
             i += 1
 
     def _initialize_centroids(self, X):
-        if self.random_state:
-            np.random.seed(self.random_state)
-        min_vals = X.min().values
-        max_vals = X.max().values
-        aleatory_points = np.random.rand(self.n_clusters, X.shape[1])
-        centroids = min_vals + (max_vals - min_vals) * aleatory_points
-        return centroids
-
+        np.random.seed(self.random_state)
+        centroids = [X[np.random.randint(X.shape[0])]]
+        for _ in range(1, self.n_clusters):
+            distances = np.min(np.linalg.norm(X[:, np.newaxis] - centroids, axis=2), axis=1)
+            probabilities = distances / np.sum(distances)
+            centroid = X[np.random.choice(X.shape[0], p=probabilities)]
+            centroids.append(centroid)
+        return np.array(centroids)
 
     def _assign_clusters(self, X):
-        distances = np.zeros((X.shape[0], self.n_clusters))
-        for i in range(X.shape[0]):
-            for j in range(self.n_clusters):
-                value = X.iloc[i].values
-                centroid = self.centroids[j]
-                distances[i, j] = self.distance_func(value, centroid)
+        distances = np.linalg.norm(X[:, np.newaxis] - self.centroids, axis=2)
         return np.argmin(distances, axis=1)
-
-
-    def _default_distance(self, x, y):
-        return np.linalg.norm(x - y)
 
     def _compute_centroids(self, X):
         centroids = []
@@ -49,8 +43,8 @@ class KMeans:
             if len(cluster_points) > 0:
                 centroids.append(cluster_points.mean(axis=0))
             else:
-                # If a cluster is empty, keep the previous centroid
-                centroids.append(self.centroids[i])
+                # Si el cluster está vacío, reposiciona el centroide al azar
+                centroids.append(X[np.random.randint(X.shape[0])])
         return np.array(centroids)
 
     def predict(self, X):
@@ -60,4 +54,6 @@ class KMeans:
         distancias = np.array([self.distance_func(X, centroid) for centroid in self.centroids])
         return np.sum(np.min(distancias, axis=0))
 
+    def _default_distance(self, x, y):
+        return np.linalg.norm(x - y)
 
