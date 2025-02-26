@@ -48,7 +48,8 @@ class KMeans:
         return np.array(centroids)
 
     def predict(self, X):
-       return self._assign_clusters(X)
+        X = X.to_numpy(dtype=np.float64)
+        return self._assign_clusters(X)
 
     def inertia(self, X):
         distancias = np.array([self.distance_func(X, centroid) for centroid in self.centroids])

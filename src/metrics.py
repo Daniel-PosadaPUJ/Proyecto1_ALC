@@ -9,7 +9,6 @@ def elbow_method(X, max_k=10, distance_func=None):
         inercia.append(kmeans.inertia(X))
 
     inercia = np.array(inercia)
-    print(inercia)
     k_optimo = np.argmin(np.diff(inercia)) + 1
     inercia_minima = inercia[k_optimo]
 
